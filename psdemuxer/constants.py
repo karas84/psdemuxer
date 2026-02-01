@@ -32,14 +32,28 @@ stream_ids = {
 }
 
 
-@lru_cache(maxsize=256)
-def get_stream_name_by_id(stream_id: int) -> str | None:
+def get_audio_stream_number(stream_id: int):
     if 0xC0 <= stream_id <= 0xDF:
         num = stream_id & 0b00011111
-        return f"audio stream number {num}"
+        return num
 
+    return -1
+
+
+def get_video_stream_number(stream_id: int):
     if 0xE0 <= stream_id <= 0xEF:
         num = stream_id & 0b00001111
+        return num
+
+    return -1
+
+
+@lru_cache(maxsize=256)
+def get_stream_name_by_id(stream_id: int) -> str | None:
+    if (num := get_audio_stream_number(stream_id)) >= 0:
+        return f"audio stream number {num}"
+
+    if (num := get_video_stream_number(stream_id)) >= 0:
         return f"video stream number {num}"
 
     return stream_ids.get(stream_id, None)

@@ -1498,7 +1498,7 @@ class Sequence:
 
 
 class MPEG2Video:
-    def __init__(self, fh: BufferedReader, identify_only: bool = False):
+    def __init__(self, fh: BufferedReader, identify_only: bool = False, info_only: bool = False):
         self.sequence_list: list[Sequence] = []
 
         # save current stream pos for later (we want to give back the reader
@@ -1514,6 +1514,9 @@ class MPEG2Video:
                 sequence = Sequence(self, fh)
                 self.sequence_list.append(sequence)
                 next_bits = peek(fh, 4)
+
+                if info_only:
+                    return
 
             assert next_bits == sequence_end_code
 

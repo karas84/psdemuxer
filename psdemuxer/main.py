@@ -7,7 +7,7 @@ from typing import Protocol, cast
 from signal import signal, SIGPIPE, SIG_DFL
 from pathlib import Path
 
-from psdemuxer.constants import get_stream_name_by_id, get_stream_id_by_name
+from psdemuxer.constants import get_stream_name_by_id, get_stream_id_by_name, get_video_stream_number
 from psdemuxer import MPEG2ProgramStream
 from psdemuxer.streams import WrongPrivateStream
 from psdemuxer.streams.private.dvdac3 import DVDAC3Audio, DVDAC3Stream
@@ -57,25 +57,37 @@ def main():
 
         for n, (stream_id, pes) in enumerate(mpeg2_program_stream.streams()):
             stream_name = get_stream_name_by_id(stream_id)
+            video_stream_num = get_video_stream_number(stream_id)
 
-            if stream_name == "private_stream_1":
+            if video_stream_num >= 0:
+                has_video_0 = True
+                video_stream_name = f"video_stream_{video_stream_num}"
+
+                bsr = StreamIdReader(mpeg2_program_stream, "video stream number 0", fh)
+                m2v = MPEG2Video(bsr, info_only=True)
+
+                video_stream_str = f" ({m2v})"
+                print(f"Stream {n}: {video_stream_name}{video_stream_str} (0x{stream_id:02X})")
+
+            elif stream_name == "private_stream_1":
                 private_stream_str = ""
+
                 try:
                     ps2_audio = PS2PCMAudio(pes, fh, is_first=True)
                     private_stream_str = f" ({ps2_audio})"
                 except WrongPrivateStream:
                     pass
+
                 try:
                     ac3_dvd_audio = DVDAC3Audio(pes, fh, is_first=True)
                     private_stream_str = f" ({ac3_dvd_audio})"
                 except WrongPrivateStream:
                     pass
+
                 print(f"Stream {n}: {stream_name}{private_stream_str} (0x{stream_id:02X})")
+
             else:
                 print(f"Stream {n}: {stream_name} (0x{stream_id:02X})")
-
-                if stream_name == "video stream number 0":
-                    has_video_0 = True
 
         if args.out_dir:
             # extract known streams
