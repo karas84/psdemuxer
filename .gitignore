@@ -1,0 +1,6 @@
+/.venv/
+/data/
+/*.egg-info/
+/.vscode/
+__pycache__/
+/private/

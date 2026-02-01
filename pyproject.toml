@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.2", "wheel", "build>=0.8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+description = "Python implementation of the MPEG2-PS standard (for demultiplexing)"
+name = "psdemuxer"
+version = "0.0.1"
+authors = [{ name = "karas84" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/karas84/psdemuxer"
+
+[project.scripts]
+psdemuxer = "psdemuxer.main:main"
+
+[tool.setuptools.package-dir]
+psdemuxer = "psdemuxer"
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 120
